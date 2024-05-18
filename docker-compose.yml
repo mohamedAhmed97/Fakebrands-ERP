@@ -1,0 +1,38 @@
+version: '3'
+services:
+    odoo:
+        container_name: odoo
+        image: aliemam/fakebrands-erp
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile
+        volumes:
+            - ./addons-extra:/mnt/extra-addons
+            - ./config:/etc/odoo
+            - ./config/odoo.conf:/etc/odoo-server.conf
+            - odoo-web-data:/var/lib/odoo
+        ports:
+            - "8069:8069"
+        depends_on:
+            - db
+    nginx:
+        container_name: nginx
+        image: nginx:latest
+        restart: always
+        ports:
+            - 80:80
+            - 4431:443
+        volumes:
+            - ./nginx/config:/etc/nginx/conf.d
+            # - ./certbot/conf:/etc/nginx/ssl
+            # - ./certbot/data:/var/www/html
+    db:
+        image: postgres:latest
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=odoo
+            - POSTGRES_PASSWORD=odoo
+        volumes:
+            - ./pgdata:/var/lib/postgresql/data 
+volumes:
+    odoo-web-data:
